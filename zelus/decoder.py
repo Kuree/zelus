@@ -2,7 +2,7 @@ from kratos import Generator, PortDirection, CombinationalCodeBlock, SwitchStmt
 from zelus.util import clog2
 
 
-class Decoder(Generator):
+class OneHotDecoder(Generator):
     def __init__(self, num_case: int, output_size: int):
         name = "Decoder_{0}_{1}".format(num_case, output_size)
         super().__init__(name)

@@ -14,14 +14,13 @@ def test_register():
 
     reg = Register(width, init_value)
     mod_src = verilog(reg)
-    src = mod_src[reg.name]
 
     with tempfile.TemporaryDirectory() as tempdir:
-        tempdir = "temp"
-
         filename = os.path.join(tempdir, reg.name + ".sv")
         with open(filename, "w+") as f:
-            f.write(src)
+            for value in mod_src.values():
+                f.write(value)
+                f.write("\n")
 
         # import it as magma circuit
         circuit = magma.DefineFromVerilogFile(filename,
@@ -56,6 +55,6 @@ def test_register():
             tester.expect(circuit.O, data[num_tests - 1])
 
         tester.compile_and_run(target="verilator",
-                               magma_output="coreir-verilog",
+                               skip_compile=True,
                                directory=tempdir,
                                flags=["-Wno-fatal"])
