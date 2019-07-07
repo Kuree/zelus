@@ -7,10 +7,12 @@ addons:
     - libgmp-dev
     - libmpfr-dev
     - libmpc-dev
+    - verilator
 
 install:
     - pip install pytest fault
     - pip install -e .
+    - pip install --ignore-installed git+https://github.com/PyHDI/Pyverilog#egg=pyverilog
 
 script: 
     - pytest tests/
