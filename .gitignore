@@ -105,3 +105,10 @@ venv.bak/
 
 # pycharm
 .idea
+
+# manual tests
+temp
+
+# pyverilog
+parser.out
+parsetab.py
