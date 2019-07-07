@@ -11,6 +11,11 @@ class OneHotDecoder(Generator):
         self.sel_size = clog2(num_case)
         self.output_size = output_size
 
+        if self.num_case > self.output_size:
+            raise ValueError(
+                "output_size {0} cannot be smaller than num_cases {1}".format(
+                    output_size, num_case))
+
         # input
         self.select = self.port("S", self.sel_size, PortDirection.In)
         self.output = self.port("O", self.output_size, PortDirection.Out)

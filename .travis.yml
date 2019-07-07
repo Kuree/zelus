@@ -1,0 +1,19 @@
+language: python
+
+install:
+    - pip install pytest fault
+    - pip install -e .
+
+script: 
+    - pytest tests/
+
+after_success:
+    - echo [distutils]                                  > ~/.pypirc
+    - echo index-servers =                             >> ~/.pypirc
+    - echo "  pypi"                                    >> ~/.pypirc
+    - echo                                             >> ~/.pypirc
+    - echo [pypi]                                      >> ~/.pypirc
+    - echo repository=https://upload.pypi.org/legacy/  >> ~/.pypirc
+    - echo username=keyi                               >> ~/.pypirc
+    - echo password=$PYPI_PASSWORD                     >> ~/.pypirc
+
