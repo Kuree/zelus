@@ -1,5 +1,5 @@
 from kratos import Generator, PortDirection, CombinationalCodeBlock, SwitchStmt
-from zelus.util import clog2
+from kratos.util import clog2
 
 
 class OneHotDecoder(Generator):
@@ -21,15 +21,11 @@ class OneHotDecoder(Generator):
         self.output = self.port("O", self.output_size, PortDirection.Out)
 
         # use procedural python code to generate the code
-        stmt = SwitchStmt(self.select)
+        comb = self.combinational()
+        switch = comb.switch_(self.select)
         # adding cases
         for i in range(self.num_case):
-            one_hot_encoding = self.const(1 << i, self.output_size)
-            stmt.add_switch_case(self.const(i, self.sel_size),
-                                 self.output.assign(one_hot_encoding))
+            switch.case_(self.const(i, self.sel_size),
+                         self.output(1 << i))
         # add a default case
-        stmt.add_switch_case(None, self.output.assign(
-            self.const(0, self.output_size)))
-        # wrap that switch statement into a combinational stmt
-        comb = CombinationalCodeBlock(self)
-        comb.add_stmt(stmt)
+        switch.case_(None, self.output(0))
