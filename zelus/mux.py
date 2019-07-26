@@ -5,9 +5,9 @@ from zelus.decoder import OneHotDecoder
 
 
 class AOIMux(Generator):
-    def __init__(self, height: int, width: int):
+    def __init__(self, height: int, width: int, is_clone: bool = False):
         name = "AOIMux_{0}_{1}".format(height, width)
-        super().__init__(name)
+        super().__init__(name, is_clone=is_clone)
 
         if height < 1:
             height = 1
@@ -62,9 +62,9 @@ class AOIMux(Generator):
 
 
 class Mux(Generator):
-    def __init__(self, height: int, width: int):
+    def __init__(self, height: int, width: int, is_clone: bool = False):
         name = "Mux_{0}_{1}".format(width, height)
-        super().__init__(name)
+        super().__init__(name, is_clone=is_clone)
 
         # pass through wires
         if height == 1:
@@ -88,3 +88,34 @@ class Mux(Generator):
             switch_.case_(i, self.out_.assign(ports[i]))
         # add default
         switch_.case_(None, self.out_.assign(0))
+
+
+class MuxDefault(Generator):
+    def __init__(self, height: int, width: int, sel_bsize: int,
+                 is_clone: bool = False):
+        name = "MuxDefault_{0}_{1}".format(width, height)
+        super().__init__(name, is_clone=is_clone)
+        default = self.parameter("default_value", width)
+
+        # pass through wires
+        if height == 1:
+            self.in_ = self.port("I", width, PortDirection.In)
+            self.out_ = self.port("O", width, PortDirection.Out)
+            self.wire(self.out_, self.in_)
+            return
+
+        self.sel_size = sel_bsize
+        ports = [self.port("I{0}".format(i), width,
+                           PortDirection.In) for i in range(height)]
+        self.out_ = self.port("O", width, PortDirection.Out)
+        self.port("S", self.sel_size, PortDirection.In)
+
+        # add a combinational block
+        comb = self.combinational()
+
+        # add a case statement
+        switch_ = comb.switch_(self.ports.S)
+        for i in range(height):
+            switch_.case_(i, self.out_.assign(ports[i]))
+        # add default
+        switch_.case_(None, self.out_.assign(default))
